@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Create Room{% endblock %}
+{% block content %}
+<h3>Fill out the following to create your own chat room:</h3>
+<form action="" method="post">
+    <dl>
+        <dd>Name: <input type="text" name="name" required="" size="30" value="{{ request.form.name }}">
+        <dd>Description: <input type="text" name="description" required="" size="30" value="{{ request.form.description }}">
+    </dl>
+    <input type="submit" value="Create Room">
+</form>
+
+{% endblock %}

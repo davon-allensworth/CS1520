@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+    <meta charset="UTF-8">
+    <title>BudgetSite - {% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% endblock %}
+</head>
+<body>
+    <div id="title">
+        <h1>BudgetSite</h1>
+    </div>
+
+    <div id="menu">
+        <script>
+            var home = document.createElement('a');
+            var menuDiv = document.getElementById("menu");
+            home.setAttribute('href',"{{ url_for('home')}}");
+            home.innerText = "Home";
+            menuDiv.appendChild(home);
+
+            {% if g.user %}
+                menuDiv.innerHTML += ' - '
+                var logout = document.createElement('a');
+                logout.setAttribute('href',"{{ url_for('logout')}}");
+                logout.innerText = "Logout";
+                menuDiv.appendChild(logout);
+            {% endif %}
+        </script>
+    </div>
+
+    <!--Include flashed messages -->
+    {% with flashes = get_flashed_messages() %}
+        {% if flashes %}
+            {% for message in flashes %}
+            <h5>{{ message }}</h5>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div id="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <div id="footer">
+        {% block footer %}
+        <br>
+        <hr>
+        Written by Davon Allensworth for CS1520
+        <hr>
+        {% endblock %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+    {% if g.user %}
+        <h3>Your Hosted Events</h3>
+            {% for event in userEvents %}
+                <strong>Title: </strong>{{event.title}}
+                <strong>Host: </strong>{{event.host}}
+                <strong>Description: </strong>{{event.description}}
+                <strong>Begins: </strong>{{event.start}}
+                <strong>Ends: </strong>{{event.end}}
+                <a href="{{ url_for('cancel_event', dedEvent=event.title) }}">Cancel Event</a>
+                <br>
+            {% else %}
+                <h5>***You are not hosting any events yet.***</h5>
+            {% endfor %}
+    {% endif %}
+
+    <h3>All Occurring Events</h3>
+    {% for event in events %}
+        <strong>Title: </strong>{{event.title}}
+        <strong>Host: </strong>{{event.host}}
+        <strong>Description: </strong>{{event.description}}
+        <strong>Begins: </strong>{{event.start}}
+        <strong>Ends: </strong>{{event.end}}
+        {% if session['username'] == event.host %}
+            <a href="{{ url_for('cancel_event', dedEvent=event.title) }}">Cancel Event</a>
+        {% endif %}
+        {% if g.user and session['username'] != event.host and event not in g.user.attends%}
+            <a href="{{ url_for('attend_event', event=event.title) }}">Attend</a>
+        {% endif %}
+        {% if g.user and session['username'] != event.host and event in g.user.attends%}
+        <strong>Attending</strong>
+        {% endif %}
+        <br>
+    {% endfor %}
+{% endblock %}

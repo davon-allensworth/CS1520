@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Rooms{% endblock %}
+{% block content %}
+<h3>Chat Rooms: </h3>
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Admin</th>
+    </tr>
+    {% for room in rooms %}
+    <tr>
+        <td><a href="{{ url_for('loadRoom', user = user, room = room.name) }}">{{ room.name }}</a></td>
+        <td>{{ room.description }}</td>
+        {% if user == room.admin %}
+            <td>You. <a href="{{ url_for('removeRoom', user = user, room = room.name) }}">Delete?</a></td>
+        {% else %}
+            <td>{{ room.admin }}</td>
+        {% endif %}
+    </tr>
+    {% else %}
+    <tr>
+        <td colspan="2">No rooms currently exist!</td>
+    </tr>
+    {% endfor %}
+</table>
+<br>
+<h3>You can also <a href="{{ url_for('makeRoom', user = user) }}">click here</a> to make a new room.</h3>
+{% endblock %}

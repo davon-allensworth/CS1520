@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+{% block content %}
+<h3>Sign up for BudgetSite</h3>
+<form action="" method="post">
+    <dl>
+        <dd>Username: <input type="text" name="username" required="" size="30" value="{{ request.form.username }}">
+        <dd>Password: <input type="password" name="password" required="" size="30">
+    </dl>
+    <input type="submit" value="Sign Up">
+</form>
+
+{% endblock %}

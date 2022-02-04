@@ -1,0 +1,397 @@
+<!-- Written by Davon Allensworth (dja52) for CS1520 -->
+<!DOCTYPE html>
+<html>
+<head>
+<title>Big Fun Bingo Game</title>
+<link rel="stylesheet" href="styles.css">
+<script type="text/javascript">
+
+    const free = "background-color: #EEEEEE";
+    const marked = "background-color: #ff9999";
+    const regex = /[Bb]\(((([1-9]|1[0-5])\,?){5})\)[Ii]\((((1[6-9]|2[0-9]|30)\,?){5})\)[Nn]\((((3[1-9]|4[0-5])\,?[Ff]?){2})[Ff]\,(((3[1-9]|4[0-5])\,?){2})\)[Gg]\((((4[6-9]|5[0-9]|60)\,?){5})\)[Oo]\((((6[1-9]|7[0-5])\,?){5})\)$/;
+
+    //generate a new random gameboard with no dupes.
+    function newRandomGame(){
+
+        //add table to the DOM
+        addCard();
+
+        //array for duplicates
+        var dupeArray = [];
+
+        //B COLUMN
+        for(var i=0; i<5; i++){
+            var space = document.getElementById(i);
+            do{
+                var randNum = Math.floor((Math.random()) * (15 - 1 + 1)) + 1;
+            } while (dupeArray.includes(randNum));
+            dupeArray.push(randNum);
+            space.innerHTML = randNum;
+            space.addEventListener("click", markSpace, false);
+        }
+        //I COLUMN
+        for(var i=5; i<10; i++){
+            var space = document.getElementById(i);
+            do{
+                var randNum = Math.floor((Math.random()) * (30 - 16 + 1)) + 16;
+            } while (dupeArray.includes(randNum));
+            dupeArray.push(randNum);
+            space.innerHTML = randNum;
+            space.addEventListener("click", markSpace, false);
+        }
+        //N COLUMN
+        for(var i=10; i<15; i++){
+            var space = document.getElementById(i);
+            if(i == 12){
+                space.setAttribute("style", marked);
+                continue;
+            }
+            do{
+                var randNum = Math.floor((Math.random()) * (45 - 31 + 1)) + 31;
+            } while (dupeArray.includes(randNum));
+            dupeArray.push(randNum);
+            space.innerHTML = randNum;
+            space.addEventListener("click", markSpace, false);
+        }
+        //G COLUMN
+        for(var i=15; i<20; i++){
+            var space = document.getElementById(i);
+            do{
+                var randNum = Math.floor((Math.random()) * (60 - 46 + 1)) + 46;
+            } while (dupeArray.includes(randNum));
+            dupeArray.push(randNum);
+            space.innerHTML = randNum;
+            space.addEventListener("click", markSpace, false);
+        }
+        //O COLUMN
+        for(var i=20; i<25; i++){
+            var space = document.getElementById(i);
+            do{
+                var randNum = Math.floor((Math.random()) * (75 - 61 + 1)) + 61;
+            } while (dupeArray.includes(randNum));
+            dupeArray.push(randNum);
+            space.innerHTML = randNum;
+            space.addEventListener("click", markSpace, false);
+        }
+
+        //get in-game buttons
+        getResultButtons();
+    }
+
+    //validate user input to generate a custom gameboard.
+    function newCustomGame(){
+
+        //add table to the DOM
+        addCard();
+
+        //add dupe checker (because I'm bad at regex)
+        var dupeArray = [];
+
+        //prompt user for string
+        do{
+            var inputString = prompt("Enter valid bingo card string: ");
+        }while(isValid(inputString) === false);
+
+        //split user's input string into corresponding values
+        var matches = inputString.match(regex);
+
+        //B VALUES
+        var bValues = matches[1].split("\,");
+        for(var i = 0; i < bValues.length; i++){
+            if(dupeArray.includes(bValues[i])){
+                alert("No duplicates allowed.");
+                breakDown();
+                newCustomGame();
+                return;
+            }
+            dupeArray.push(bValues[i]);
+            var space = document.getElementById(i);
+            space.innerHTML = bValues[i];
+            space.addEventListener("click", markSpace, false);
+        }
+
+        //I VALUES
+        var iValues = matches[4].split("\,");
+        for(var i = 0; i < iValues.length; i++){
+            if(dupeArray.includes(iValues[i])){
+                alert("No duplicates allowed.");
+                breakDown();
+                newCustomGame();
+                return;
+            }
+            dupeArray.push(iValues[i]);
+            var space = document.getElementById(i + 5);
+            space.innerHTML = iValues[i];
+            space.addEventListener("click", markSpace, false);
+        }
+        
+        //N VALUES
+        n1Values = matches[7].split("\,");
+        n2Values = matches[10].split("\,");
+        dupeArray.push(n1Values[0]);
+        document.getElementById(10).innerHTML = n1Values[0];
+        document.getElementById(10).addEventListener("click", markSpace, false);
+        if(dupeArray.includes(n1Values[1])){
+            alert("No duplicates allowed.");
+            breakDown();
+            newCustomGame();
+            return;
+        }
+        dupeArray.push(n1Values[1]);
+        document.getElementById(11).innerHTML = n1Values[1];
+        document.getElementById(11).addEventListener("click", markSpace, false);
+        if(dupeArray.includes(n2Values[0])){
+            alert("No duplicates allowed.");
+            breakDown();
+            newCustomGame();
+            return;
+        }
+        dupeArray.push(n2Values[0]);
+        document.getElementById(12).setAttribute('style', marked);
+        document.getElementById(13).innerHTML = n2Values[0];
+        document.getElementById(13).addEventListener("click", markSpace, false);
+        if(dupeArray.includes(n2Values[1])){
+            alert("No duplicates allowed.");
+            breakDown();
+            newCustomGame();
+            return;
+        }
+        document.getElementById(14).innerHTML = n2Values[1];
+        document.getElementById(14).addEventListener("click", markSpace, false);
+
+        //G VALUES
+        var gValues = matches[13].split("\,");
+        for(var i = 0; i < gValues.length; i++){
+            if(dupeArray.includes(gValues[i])){
+                alert("No duplicates allowed.");
+                breakDown();
+                newCustomGame();
+                return;
+            }
+            dupeArray.push(gValues[i]);
+            var space = document.getElementById(i + 15);
+            space.innerHTML = gValues[i];
+            space.addEventListener("click", markSpace, false);
+        }
+
+        //O VALUES
+        var oValues = matches[16].split("\,");
+        for(var i = 0; i < oValues.length; i++){
+            if(dupeArray.includes(oValues[i])){
+                alert("No duplicates allowed.");
+                breakDown();
+                newCustomGame();
+                return;
+            }
+            dupeArray.push(oValues[i]);
+            var space = document.getElementById(i + 20);
+            space.innerHTML = oValues[i];
+            space.addEventListener("click", markSpace, false);
+        }
+
+        //get in-game buttons
+        getResultButtons();
+    }
+
+    //validates user input string using regex
+    function isValid(input){
+        return regex.test(input);
+    }
+
+    //toggle if a space is marked not available for freespace
+    function markSpace(space){
+        if(space.target.getAttribute("style") == marked)
+            space.target.setAttribute("style", free);
+        else{
+            space.target.setAttribute("style", marked);
+            checkBingo();
+        }
+    }
+
+    //user has clicked "I won." ensure they won and record score.
+    function userWin(){
+        //if user has actually won...
+        if(hasBingo() === true){
+            getRestartButtons();
+            breakDown();
+
+            //increment wins
+            var wins = Number(localStorage.getItem('wins'));
+            localStorage.setItem('wins', wins + 1);
+            updateScoreboard();
+        }
+        else{
+            alert("No you didn't. Keep playing.");
+        }
+    }
+
+    //someone else got bingo, record loss and clear the gameboard.
+    function userLose(){
+        getRestartButtons();
+        breakDown();
+
+        //increment losses
+        var losses = Number(localStorage.getItem('losses'));
+        localStorage.setItem('losses', losses + 1);
+        updateScoreboard();
+    }
+
+    //swap start buttons for in-game ones.
+    function getResultButtons(){
+        var buttonList = document.getElementById("buttons");
+        var customButton = document.getElementById('customButton');
+        var randomButton = document.getElementById('randomButton');
+
+        var win = document.createElement('input')
+        win.setAttribute('type', 'button');
+        win.setAttribute('id', 'winButton');
+        win.setAttribute('value', 'I won!');
+        win.addEventListener('click', userWin, false);
+
+        var lose = document.createElement('input')
+        lose.setAttribute('type', 'button');
+        lose.setAttribute('id', 'loseButton');
+        lose.setAttribute('value', 'I lost...');
+        lose.addEventListener('click', userLose, false);
+
+        buttonList.replaceChild(win, randomButton);
+        buttonList.replaceChild(lose, customButton);
+    }
+
+    //swap in-game buttons for the start ones.
+    function getRestartButtons(){
+        var buttonList = document.getElementById("buttons");
+        var winButton = document.getElementById('winButton');
+        var loseButton = document.getElementById('loseButton');
+
+        var random = document.createElement('input')
+        random.setAttribute('type', 'button');
+        random.setAttribute('id', 'randomButton');
+        random.setAttribute('value', 'New Random Game');
+        random.addEventListener('click', newRandomGame, false);
+
+        var custom = document.createElement('input')
+        custom.setAttribute('type', 'button');
+        custom.setAttribute('id', 'customButton');
+        custom.setAttribute('value', 'New Custom Game');
+        custom.addEventListener('click', newCustomGame, false);
+
+        buttonList.replaceChild(random, winButton);
+        buttonList.replaceChild(custom, loseButton);
+    }
+    
+    //the table string below is a compressed version of my previous html (sorry for the length)
+    function addCard(){
+        var playArea = document.getElementById("playArea");
+        var table = '<table id="bingoCard"> <tr> <th>B</th> <th>I</th> <th>N</th> <th>G</th> <th>O</th> </tr> <tr> <td id="0">&nbsp;</td> <td id="5">&nbsp;</td> <td id="10">&nbsp;</td> <td id="15">&nbsp;</td> <td id="20">&nbsp;</td> </tr> <tr> <td id="1">&nbsp;</td> <td id="6">&nbsp;</td> <td id="11">&nbsp;</td> <td id="16">&nbsp;</td> <td id="21">&nbsp;</td> </tr> <tr> <td id="2">&nbsp;</td> <td id="7">&nbsp;</td> <td id="12">FREE</td> <td id="17">&nbsp;</td> <td id="22">&nbsp;</td> </tr> <tr> <td id="3">&nbsp;</td> <td id="8">&nbsp;</td> <td id="13">&nbsp;</td> <td id="18">&nbsp;</td> <td id="23">&nbsp;</td> </tr> <tr> <td id="4">&nbsp;</td> <td id="9">&nbsp;</td> <td id="14">&nbsp;</td> <td id="19">&nbsp;</td> <td id="24">&nbsp;</td> </tr></table>';
+        var wrapper = document.createElement('div');
+        wrapper.setAttribute('id','cardDiv');
+        wrapper.innerHTML = table;
+        playArea.appendChild(wrapper);
+    }
+
+    function breakDown(){
+        for(var i = 0; i < 25; i++){
+            if(i == 12)
+                continue;
+            var space = document.getElementById(i);
+            space.setAttribute("style", free);
+            space.innerHTML = "&nbsp;";
+        }
+        var card = document.getElementById("cardDiv");
+        card.remove();
+    }
+
+    //takes in spaceid and returns true if marked, false if not.
+    function isMarked(spaceId){
+        var space = document.getElementById(spaceId);
+        return (space.getAttribute("style") == marked);
+    }
+
+    //if true, calls the bingo alert, otherwise does nothing.
+    function checkBingo(){
+        if (hasBingo() === true)
+            alert("BINGO!");
+    }
+    
+    //returns true if there is a bingo (12 possible ways)
+    function hasBingo(){
+        //verticals
+        if(isMarked(0)===true && isMarked(1)===true && isMarked(2)===true && isMarked(3)===true && isMarked(4)===true)
+            return true;
+        if(isMarked(5)===true && isMarked(6)===true && isMarked(7)===true && isMarked(8)===true && isMarked(9)===true)
+            return true;
+        if(isMarked(10)===true && isMarked(11)===true && isMarked(13)===true && isMarked(14)===true)
+            return true;
+        if(isMarked(15)===true && isMarked(16)===true && isMarked(17)===true && isMarked(18)===true && isMarked(19)===true)
+            return true;
+        if(isMarked(20)===true && isMarked(21)===true && isMarked(22)===true && isMarked(23)===true && isMarked(24)===true)
+            return true;
+        //horizontals
+        if(isMarked(0)===true && isMarked(5)===true && isMarked(10)===true && isMarked(15)===true && isMarked(20)===true)
+            return true;
+        if(isMarked(1)===true && isMarked(6)===true && isMarked(11)===true && isMarked(16)===true && isMarked(21)===true)
+            return true;
+        if(isMarked(2)===true && isMarked(7)===true && isMarked(17)===true && isMarked(22)===true)
+            return true;
+        if(isMarked(3)===true && isMarked(8)===true && isMarked(13)===true && isMarked(18)===true && isMarked(23)===true)
+            return true;
+        if(isMarked(4)===true && isMarked(9)===true && isMarked(14)===true && isMarked(19)===true && isMarked(24)===true)
+            return true;
+        //diagonals
+        if(isMarked(0)===true && isMarked(6)===true && isMarked(18)===true && isMarked(24)===true)
+            return true;
+        if(isMarked(4)===true && isMarked(8)===true && isMarked(16)===true && isMarked(20)===true)
+            return true;
+        //no bingo
+        return false;
+    }
+</script>
+</head>
+
+<body>
+<div id="playArea">
+    <h1>really super cool bingo simulator</h1>
+<script type="text/javascript">
+    function setupStorage(){
+        localStorage.setItem('wins', Number(0));
+        localStorage.setItem('losses', Number(0));
+    }
+
+    function updateScoreboard(){
+         //if not initialized
+        if(localStorage.getItem('wins') === null){
+            setupStorage();
+        }   
+        var wins = Number(localStorage.getItem('wins'));
+        var losses = Number(localStorage.getItem('losses'));
+        document.getElementById('winSpace').innerHTML = wins;
+        document.getElementById('loseSpace').innerHTML = losses;
+    }
+
+</script>
+
+<form id = "buttons" onsubmit = "return false">
+    <input type = "button" id = "randomButton" onclick = "newRandomGame()" value = "New Random Game"/>
+    <input type = "button" id = "customButton" onclick = "newCustomGame()" value = "New Custom Game"/>
+</form>
+
+<table id="scoreboard" style="border-collapse: collapse;">
+    <caption>Scoreboard</caption>
+    <tr>
+        <th>Wins</th>
+        <th>Losses</th>
+    </tr>
+    <tr>
+        <td id="winSpace">&nbsp;</td>
+        <td id="loseSpace">&nbsp;</td>
+    </tr>
+</table>
+<script type="text/javascript">
+    updateScoreboard();
+</script>
+<br>
+
+</div>
+</body>
+</html>

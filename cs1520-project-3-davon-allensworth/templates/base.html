@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+    <meta charset="UTF-8">
+    <title>ChatSite - {% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% endblock %}
+</head>
+<body>
+    <div id="title">
+        <h1>ChatSite</h1>
+    </div>
+
+    <div id="menu">
+        <script>
+            var user = "{{ user }}";
+            if(user !== ""){
+                // Chat Rooms
+                var roomsLink = document.createElement('a');
+                var menuDiv = document.getElementById("menu");
+                roomsLink.setAttribute('href',"{{ url_for('rooms', user = user) }}");
+                roomsLink.innerText = "Rooms";
+
+                //Logout
+                var logoutLink = document.createElement('a');
+                logoutLink.setAttribute('href',"{{ url_for('logout', user = user) }}");
+                logoutLink.innerText = "Logout";
+
+                menuDiv.appendChild(roomsLink);
+                menuDiv.innerHTML += ' - '
+                menuDiv.appendChild(logoutLink);
+            }
+            else{
+                var link = document.createElement('a');
+                var menuDiv = document.getElementById("menu");
+                link.setAttribute('href',"{{ url_for('home') }}");
+                link.innerText = "Home";
+                menuDiv.appendChild(link);
+            }
+        </script>
+    </div>
+
+    <!--Include flashed messages -->
+    {% with flashes = get_flashed_messages() %}
+        {% if flashes %}
+            {% for message in flashes %}
+            <h5>{{ message }}</h5>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div id="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <div id="footer">
+        {% block footer %}
+        <br>
+        <hr>
+        Written by Davon Allensworth for CS1520
+        <hr>
+        {% endblock %}
+    </div>
+</body>
+</html>

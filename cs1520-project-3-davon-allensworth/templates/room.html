@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}{{ room.name }}{% endblock %}
+{% block content %}
+
+<script>
+    //sets up button events and refresh
+    function setFunctionality(){
+        document.getElementById("postButton").addEventListener("click", addMessage, true)
+        timeoutID = window.setTimeout(refresh, 1000);
+    }
+
+    function addMessage() {
+        //Prep the request
+        var request = new XMLHttpRequest();
+        request.onreadystatechange = function(){ postNewMessage(request)};
+        request.open("POST", "/add_message");
+        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+        //send the data to server
+        var data = "message=" + document.getElementById("message").value + "&room=" + "{{ room.name|safe }}" + "&user=" + "{{ user }}";
+        request.send(data);
+    }
+
+    function postNewMessage(request) {
+        if (request.readyState === XMLHttpRequest.DONE) {
+            if (request.status === 200) {
+                //message successfully added, update table
+                var table = document.getElementById("messages");
+
+                //proceed to append new message
+                var author = "{{ user }}";
+                var text = document.getElementById("message").value;
+                var newRow = table.insertRow();
+                authorCell = newRow.insertCell();
+                authorCell.innerHTML = author;
+                textCell = newRow.insertCell();
+                textCell.innerHTML = text;
+
+                //clear chat box
+                document.getElementById("message").value = "";
+
+            } else {
+                alert("Unfortunately, the message was unable to be posted.");
+            }
+        }
+    }
+
+    function refresh() {
+        //prep the request
+        var request = new XMLHttpRequest();
+        request.onreadystatechange = function() { getNewMessages(request) };
+        request.open("GET", "{{ url_for('get_messages', user = user, room = room.name) }}");
+        request.send();
+    }
+
+    //alerts the user that the room has been deleted and then redirects to rooms
+    function roomDead(){
+        alert("The admin has deleted the room.");
+        window.location.href = "{{ url_for('rooms', user = user)}}";
+    }
+
+    function getNewMessages(request) {
+        if (request.readyState === XMLHttpRequest.DONE) {
+            if (request.status === 200) {
+                //recieved data from server, check for new messages
+                var table = document.getElementById("messages");
+                var response = request.responseText;
+                
+                //checks for if the room was deleted
+                try{
+                    var serverMessages = JSON.parse(response);
+                }
+                catch(err){
+                    roomDead();
+                }
+                
+                //compare existing messages with server
+                if(table.rows.length - 1 < serverMessages.length){
+                    
+                    //proceed to append new messages
+                    for(var i = table.rows.length - 1; i < serverMessages.length; i++){
+                        var author = serverMessages[i].author;
+                        var text = serverMessages[i].text;
+                        var newRow = table.insertRow();
+                        authorCell = newRow.insertCell();
+                        authorCell.innerHTML = author;
+                        textCell = newRow.insertCell();
+                        textCell.innerHTML = text;
+                    }
+                }
+                timeoutID = window.setTimeout(refresh, 1000);
+            } else {
+                alert("Error recieving new messages. Please refresh the page.");
+            }
+        }
+    }
+    //Set the chat active
+    window.addEventListener("load", setFunctionality, true);
+</script>
+
+<h2>{{ room.name }}</h2>
+<h4>"{{ room.description }}"</h4>
+<table id="messages">
+    <tr>
+        <th><strong>Author</strong></th>
+        <th>Message</th>
+    </tr>
+    {% for message in room.messages %}
+        <tr>
+            <td>{{ message.author }}</td>
+            <td>{{ message.text }}</td>
+        </tr>
+    {% else %}
+        <script>
+            alert("This is a new chat! Send a message to start the conversation.")
+        </script>
+    {% endfor %}
+</table>
+<br>
+<h3>Post a Message!</h3>
+<form action="">
+    <dl>
+        <dd>Message: <input type="text" id="message" name="message" required="" size="45">
+    </dl>
+    <input type="button" value="Post" id="postButton">
+</form>
+{% endblock %}

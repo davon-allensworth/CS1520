@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}cancelEvent{% endblock %}
+{% block content %}
+    <h3>Are you sure you want to cancel this event?</h3>
+    <form action="" method="post">
+        <label for="choice">Select yes or no:</label>
+        <select id="choice" name="choice">
+            <option value="no">No</option>
+            <option value="yes">Yes</option>
+        </select>
+    <input type="submit" value="Submit">
+    </form>
+{% endblock %}

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% block head %}
+  <title>EventSite - {% block title %}{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% endblock %}
+</head>
+
+<body>
+  <div id="title">
+    <h1>EventSite</h1>
+  </div>
+
+  <div id="menu">
+    <!--Links for when a user is logged in -->
+    {% if g.user %}
+      <a href="{{ url_for('homepage') }}">Home</a>
+      <a href="{{ url_for('create_event') }}">CreateEvent</a>
+      <a href="{{ url_for('logout') }}">Logout</a>
+
+    <!--Links for when a user is not logged in -->
+    {% else %}
+      <a href="{{ url_for('homepage') }}">Home</a>
+      <a href="{{ url_for('login') }}">Login</a>
+      <a href="{{ url_for('register') }}">Register</a>
+    {% endif %}
+  </div>
+
+  <!--Include flashed messages -->
+  {% with flashes = get_flashed_messages() %}
+    {% if flashes %}
+      {% for message in flashes %}
+        <h5>{{ message }}</h5>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <div id="content">
+    {% block content %}
+    {% endblock %}
+  </div>
+
+  <div id="footer">
+    {% block footer %}
+        <br>
+        <hr>
+        Written by Davon Allensworth for CS1520
+        <hr>
+    {% endblock %}
+  </div>
+</body>
+</html>
+
+
